@@ -1,0 +1,12 @@
+{
+  "Author": "keifufu / cycleapple（API 13 繁中移植）",
+  "Name": "Facade",
+  "InternalName": "Facade",
+  "Punchline": "自訂住宅外觀與節慶裝飾。",
+  "Description": "在本機變更住宅外觀、染色與住宅區節慶裝飾。進入地皮時會還原外觀，以保留原本的碰撞判定。輸入 /facade 開啟介面。Dalamud API 13 繁體中文（zh-TW）版本。",
+  "ApplicableVersion": "any",
+  "DalamudApiLevel": 13,
+  "RepoUrl": "https://github.com/cycleapple/Facade",
+  "IconUrl": "https://raw.githubusercontent.com/cycleapple/Facade/api13-tw/images/icon.png",
+  "Tags": ["housing", "exterior", "facade", "zh-TW"]
+}

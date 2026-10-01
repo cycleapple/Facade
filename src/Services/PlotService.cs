@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
 namespace Facade.Services;
@@ -22,9 +23,14 @@ public interface IPlotService : IHostedService
 #endif
 }
 
-public class PlotService(ILogger _logger, Configuration _configuration, IClientState _clientState, IDalamudPluginInterface _pluginInterface, IPlayerState _playerState, IObjectTable _objectTable) : IPlotService
+public class PlotService(ILogger _logger, Configuration _configuration, IClientState _clientState, IDalamudPluginInterface _pluginInterface, IObjectTable _objectTable) : IPlotService
 {
   private Dictionary<(District District, byte Division), List<Plot>> _plots = [];
+
+  // Retain the API 13.0.0.8 entry point; newer TC API 13 builds mark it obsolete.
+#pragma warning disable CS0618
+  private IPlayerCharacter? LocalPlayer => _clientState.LocalPlayer;
+#pragma warning restore CS0618
 
   public Task StartAsync(CancellationToken cancellationToken)
   {
@@ -60,12 +66,12 @@ public class PlotService(ILogger _logger, Configuration _configuration, IClientS
     return Task.CompletedTask;
   }
 
-  public uint CurrentWorld => _playerState.CurrentWorld.RowId;
+  public uint CurrentWorld => LocalPlayer?.CurrentWorld.RowId ?? 0;
   public District CurrentDistrict
   {
     get
     {
-      if (Enum.IsDefined(typeof(District), _clientState.TerritoryType))
+      if (Enum.IsDefined((District)_clientState.TerritoryType))
       {
         return (District)_clientState.TerritoryType;
       }
@@ -90,17 +96,17 @@ public class PlotService(ILogger _logger, Configuration _configuration, IClientS
 #endif
 
     if (CurrentWard == -1) return [];
-    if (_objectTable.LocalPlayer == null) return [];
+    if (LocalPlayer == null) return [];
 
     List<(Vector2, uint)> positions = [];
     foreach (IBattleChara player in _objectTable.PlayerObjects)
     {
-      if (_configuration.PlayerBehavior != PlayerBehavior.Nothing || _previousPlayerBehavior != _configuration.PlayerBehavior || player.EntityId == _objectTable.LocalPlayer.EntityId || reset)
+      if (_configuration.PlayerBehavior != PlayerBehavior.Nothing || _previousPlayerBehavior != _configuration.PlayerBehavior || player.EntityId == LocalPlayer.EntityId || reset)
       {
         positions.Add((new(player.Position.X, player.Position.Z), player.EntityId));
         if (_hiddenPlayers.Contains(player.EntityId))
         {
-          ((GameObject*)player.Address)->RenderFlags &= ~(VisibilityFlags.Model | VisibilityFlags.Nameplate);
+          ((GameObject*)player.Address)->RenderFlags &= ~(int)(VisibilityFlags.Model | VisibilityFlags.Nameplate);
           _hiddenPlayers.Remove(player.EntityId);
         }
       }
@@ -121,18 +127,18 @@ public class PlotService(ILogger _logger, Configuration _configuration, IClientS
       {
         if (plot.IsInside(position, 3.5f))
         {
-          if (_configuration.PlayerBehavior == PlayerBehavior.HidePlayers && _objectTable.LocalPlayer.EntityId != entityId)
+          if (_configuration.PlayerBehavior == PlayerBehavior.HidePlayers && LocalPlayer.EntityId != entityId)
           {
             IGameObject gameObject = _objectTable.First((o) => o.EntityId == entityId);
             if (gameObject != null && !localPlayerPlots.Contains(plot.PlotId) && !reset)
             {
-              ((GameObject*)gameObject.Address)->RenderFlags |= VisibilityFlags.Model | VisibilityFlags.Nameplate;
+              ((GameObject*)gameObject.Address)->RenderFlags |= (int)(VisibilityFlags.Model | VisibilityFlags.Nameplate);
               _hiddenPlayers.Add(gameObject.EntityId);
             }
           }
           else
           {
-            if (_objectTable.LocalPlayer.EntityId == entityId)
+            if (LocalPlayer.EntityId == entityId)
             {
               localPlayerPlots.Add(plot.PlotId);
             }
@@ -160,8 +166,8 @@ public class PlotService(ILogger _logger, Configuration _configuration, IClientS
       return;
     }
 
-    if (_objectTable.LocalPlayer == null) return;
-    Vector2 position = new(_objectTable.LocalPlayer.Position.X, _objectTable.LocalPlayer.Position.Z);
+    if (LocalPlayer == null) return;
+    Vector2 position = new(LocalPlayer.Position.X, LocalPlayer.Position.Z);
 
     _plots.TryGetValue((CurrentDistrict, CurrentDivision), out List<Plot>? plots);
     plots ??= [];
@@ -261,10 +267,10 @@ public class Plot
     Vector2 pointVector3 = position - paddedCorners[2];
     Vector2 pointVector4 = position - paddedCorners[3];
 
-    bool isOnLeftOfEdge1 = Vector2.Cross(edge1, pointVector1) >= 0;
-    bool isOnLeftOfEdge2 = Vector2.Cross(edge2, pointVector2) >= 0;
-    bool isOnLeftOfEdge3 = Vector2.Cross(edge3, pointVector3) >= 0;
-    bool isOnLeftOfEdge4 = Vector2.Cross(edge4, pointVector4) >= 0;
+    bool isOnLeftOfEdge1 = (edge1.X * pointVector1.Y - edge1.Y * pointVector1.X) >= 0;
+    bool isOnLeftOfEdge2 = (edge2.X * pointVector2.Y - edge2.Y * pointVector2.X) >= 0;
+    bool isOnLeftOfEdge3 = (edge3.X * pointVector3.Y - edge3.Y * pointVector3.X) >= 0;
+    bool isOnLeftOfEdge4 = (edge4.X * pointVector4.Y - edge4.Y * pointVector4.X) >= 0;
 
     return isOnLeftOfEdge1 && isOnLeftOfEdge2 && isOnLeftOfEdge3 && isOnLeftOfEdge4;
   }

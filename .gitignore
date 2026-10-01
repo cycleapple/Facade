@@ -1,3 +1,5 @@
 bin/
 obj/
 decomp/
+*.log
+*-api13.txt

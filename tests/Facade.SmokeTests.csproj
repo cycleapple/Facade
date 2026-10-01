@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Facade.csproj" />
+    <Reference Include="Dalamud" HintPath="$(DALAMUD_HOME)/Dalamud.dll" />
+    <Reference Include="FFXIVClientStructs" HintPath="$(DALAMUD_HOME)/FFXIVClientStructs.dll" />
+    <Reference Include="InteropGenerator.Runtime" HintPath="$(DALAMUD_HOME)/InteropGenerator.Runtime.dll" />
+    <Reference Include="Newtonsoft.Json" HintPath="$(DALAMUD_HOME)/Newtonsoft.Json.dll" />
+    <None Include="../data/plots.json" Link="plots.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

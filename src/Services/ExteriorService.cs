@@ -209,17 +209,13 @@ public class ExteriorService(ILogger _logger, Configuration _configuration, IPlo
   private unsafe void SetFestival(List<GameMain.Festival> festivals)
   {
     if (_plotService.CurrentDivision == 0) return;
-    if (festivals.Count != 8) return;
+    if (_layoutWorld == null || _layoutWorld->ActiveLayout == null) return;
+    // API 13 / TC has four slots; derive the count from the runtime structure.
+    int festivalCount = _layoutWorld->ActiveLayout->ActiveFestivals.Length;
+    if (festivals.Count != festivalCount) return;
 
-    fixed (GameMain.Festival* festivalsArray = new GameMain.Festival[8])
+    fixed (GameMain.Festival* festivalsArray = festivals.ToArray())
     {
-      for (int i = 0; i < 8; i++)
-      {
-        festivalsArray[i].Id = festivals[i].Id;
-        festivalsArray[i].Phase = festivals[i].Phase;
-      }
-
-      if (_layoutWorld == null || _layoutWorld->ActiveLayout == null) return;
       _layoutWorld->ActiveLayout->SetActiveFestivals(festivalsArray);
     }
   }
@@ -229,7 +225,7 @@ public class ExteriorService(ILogger _logger, Configuration _configuration, IPlo
     if (_layoutWorld == null || _layoutWorld->ActiveLayout == null) return;
     FestivalFacade? festivalFacade = GetCurrentFestivalFacade();
 
-    if (_originalFestival.Count == 8 && (festivalFacade == null || reset))
+    if (_originalFestival.Count == _layoutWorld->ActiveLayout->ActiveFestivals.Length && (festivalFacade == null || reset))
     {
       SetFestival(_originalFestival);
       _originalFestival.Clear();
@@ -248,8 +244,8 @@ public class ExteriorService(ILogger _logger, Configuration _configuration, IPlo
       {
         Id = festivalFacade.Id
       };
-      GameMain.Festival empty = new();
-      List<GameMain.Festival> currentFestivalIds = [newFestival, empty, empty, empty, empty, empty, empty, empty];
+      List<GameMain.Festival> currentFestivalIds = new(new GameMain.Festival[_layoutWorld->ActiveLayout->ActiveFestivals.Length]);
+      currentFestivalIds[0] = newFestival;
       SetFestival(currentFestivalIds);
     }
   }
@@ -257,7 +253,7 @@ public class ExteriorService(ILogger _logger, Configuration _configuration, IPlo
   private unsafe void SetExterior(sbyte plot, OutdoorPlotExteriorData exteriorData)
   {
     if (_layoutWorld == null || _layoutWorld->ActiveLayout == null || _layoutWorld->ActiveLayout->OutdoorExteriorData == null) return;
-    if (plot >= 60) return;
+    if (plot < 0 || plot >= _layoutWorld->ActiveLayout->OutdoorExteriorData->Plots.Length) return;
     if (_layoutWorld->ActiveLayout->OutdoorExteriorData->Plots[plot].Size != exteriorData.Size) return;
     _layoutWorld->ActiveLayout->HousingLayoutDataUpdatePending = true;
     for (int i = 0; i < 8; i++)
@@ -278,7 +274,7 @@ public class ExteriorService(ILogger _logger, Configuration _configuration, IPlo
     IEnumerable<Facade> facades = GetCurrentFacades();
     foreach (Facade facade in facades)
     {
-      if (facade.Plot >= exteriorPlots.Length) return;
+      if (facade.Plot < 0 || facade.Plot >= exteriorPlots.Length) continue;
       OutdoorPlotExteriorData exteriorData = exteriorPlots[facade.Plot];
       byte plotSize = (byte)exteriorData.Size;
       handledPlots.Add(facade.Plot);

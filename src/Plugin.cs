@@ -16,7 +16,6 @@ public sealed class Plugin : IDalamudPlugin
     IDataManager dataManager,
     IClientState clientState,
     IObjectTable objectTable,
-    IPlayerState playerState,
     ICommandManager commandManager,
     ITextureProvider textureProvider,
     IDalamudPluginInterface pluginInterface
@@ -36,7 +35,6 @@ public sealed class Plugin : IDalamudPlugin
         collection.AddSingleton(dataManager);
         collection.AddSingleton(clientState);
         collection.AddSingleton(objectTable);
-        collection.AddSingleton(playerState);
         collection.AddSingleton(commandManager);
         collection.AddSingleton(textureProvider);
         collection.AddSingleton(pluginInterface);

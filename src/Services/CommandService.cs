@@ -11,7 +11,7 @@ public class CommandService(ILogger _logger, ConfigWindow _configWindow, IComman
   {
     _commandManager.AddHandler(FacadeCommand, new CommandInfo(OnCommand)
     {
-      HelpMessage = $"See '{FacadeCommand} help' for more."
+      HelpMessage = $"輸入「{FacadeCommand} help」查看說明。"
     });
 
     _logger.ServiceLifecycle();
@@ -26,7 +26,7 @@ public class CommandService(ILogger _logger, ConfigWindow _configWindow, IComman
     return Task.CompletedTask;
   }
 
-  private async void OnCommand(string command, string arguments)
+  private void OnCommand(string command, string arguments)
   {
     _logger.Debug($"command::'{command}' arguments::'{arguments}'");
 
@@ -54,13 +54,13 @@ public class CommandService(ILogger _logger, ConfigWindow _configWindow, IComman
         break;
       case "help":
       case "?":
-        _logger.Chat("Available commands:");
-        _logger.Chat($"  {command} help - Display this help menu");
-        _logger.Chat($"  {command} version - Print the plugin's version");
-        _logger.Chat($"  {command} - Toggle the configuration window");
+        _logger.Chat("可用指令：");
+        _logger.Chat($"  {command} help - 顯示指令說明");
+        _logger.Chat($"  {command} version - 顯示插件版本");
+        _logger.Chat($"  {command} - 開啟或關閉設定視窗");
         break;
       default:
-        _logger.Chat("Invalid command:");
+        _logger.Chat("無效的指令：");
         _logger.Chat($"  {command} {arguments}");
         goto case "help";
     }

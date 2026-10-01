@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+<Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
-    <Version>1.0.0.2</Version>
+    <Version>1.0.0.3</Version>
   </PropertyGroup>
 
   <PropertyGroup>
     <Author>keifufu</Author>
     <Name>Facade</Name>
-    <Punchline>Change your neighbours' housing exterior appearance.</Punchline>
-    <Description>Visually change the exterior appearance of any house so it's no longer an eyesore. (Note: Changes reset upon entering the plot to restore intended collission)</Description>
-    <RepoUrl>https://github.com/keifufu/Facade</RepoUrl>
+    <Punchline>自訂住宅外觀與節慶裝飾。</Punchline>
+    <Description>在本機變更住宅外觀、染色與住宅區節慶裝飾。進入地皮時會還原外觀，以保留原本的碰撞判定。Dalamud API 13 繁體中文（zh-TW）版本。</Description>
+    <RepoUrl>https://github.com/cycleapple/Facade</RepoUrl>
     <IconUrl>https://raw.githubusercontent.com/keifufu/Facade/main/images/icon.png</IconUrl>
     <Tags>facade;housing;exterior</Tags>
   </PropertyGroup>
@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
+    <Compile Remove="tests/**/*.cs" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
   </ItemGroup>
 </Project>
