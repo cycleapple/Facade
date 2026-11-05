@@ -106,7 +106,7 @@ public class PlotService(ILogger _logger, Configuration _configuration, IClientS
         positions.Add((new(player.Position.X, player.Position.Z), player.EntityId));
         if (_hiddenPlayers.Contains(player.EntityId))
         {
-          ((GameObject*)player.Address)->RenderFlags &= ~(int)(VisibilityFlags.Model | VisibilityFlags.Nameplate);
+          ((GameObject*)player.Address)->RenderFlags &= ~(VisibilityFlags.Model | VisibilityFlags.Nameplate);
           _hiddenPlayers.Remove(player.EntityId);
         }
       }
@@ -132,7 +132,7 @@ public class PlotService(ILogger _logger, Configuration _configuration, IClientS
             IGameObject gameObject = _objectTable.First((o) => o.EntityId == entityId);
             if (gameObject != null && !localPlayerPlots.Contains(plot.PlotId) && !reset)
             {
-              ((GameObject*)gameObject.Address)->RenderFlags |= (int)(VisibilityFlags.Model | VisibilityFlags.Nameplate);
+              ((GameObject*)gameObject.Address)->RenderFlags |= (VisibilityFlags.Model | VisibilityFlags.Nameplate);
               _hiddenPlayers.Add(gameObject.EntityId);
             }
           }

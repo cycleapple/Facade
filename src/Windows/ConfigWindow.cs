@@ -128,7 +128,7 @@ public class ConfigWindow(ILogger _logger, Configuration _configuration, IExteri
     {
       float fontPx = UiBuilder.DefaultFontSizePx;
       SafeFontConfig safeFontConfig = new() { SizePx = fontPx, GlyphRanges = [0x0020, 0x00FF, 0x2000, 0x206F, 0x3000, 0x30FF, 0x3400, 0x9FFF, 0xFF00, 0xFFEF, 0] };
-      tk.AddDalamudAssetFont(Dalamud.DalamudAsset.NotoSansScMedium, safeFontConfig);
+      tk.AddDalamudAssetFont(Dalamud.DalamudAsset.NotoSansJpMedium, safeFontConfig);
       tk.AttachExtraGlyphsForDalamudLanguage(safeFontConfig);
     });
   });
@@ -1275,7 +1275,7 @@ public class ConfigWindow(ILogger _logger, Configuration _configuration, IExteri
       foreach (Stain stainRow in _dataManager.GetExcelSheet<Stain>())
       {
         // API 13 names the housing-applicable flag (packed bool 1) Unknown2.
-        if (stainRow.RowId != 0 && (stainRow.Name.IsEmpty || !stainRow.Unknown2)) continue;
+        if (stainRow.RowId != 0 && (stainRow.Name.IsEmpty || !stainRow.IsHousingApplicable)) continue;
 
         DrawColorCircle(stainRow.RowId, 16);
         ImGui.Dummy(ScaledVector2(16));
